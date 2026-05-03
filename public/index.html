@@ -36,6 +36,20 @@
           '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }).addTo(map);
 
+      const remoteMarkers = new Map();
+      socket.on('server:location:update', (data) => {
+        const { id, latitude, longitude } = data;
+        if (!remoteMarkers.has(id)) {
+          const marker = L.marker([latitude, longitude])
+            .addTo(map)
+            .bindPopup(id);
+          remoteMarkers.set(id, marker);
+        } else {
+          const existingMarker = remoteMarkers.get(id);
+          existingMarker.setLatLng([latitude, longitude]); 
+        }
+      });
+
       function getUserSCurrentLocation() {
         return new Promise((res, rej) => {
           if ("geolocation" in navigator) {
