@@ -25,10 +25,10 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
-<script src="/socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
     <script>
-        const socket = io()
+      const socket = io();
       const map = L.map("map").setView([51.505, -0.09], 13);
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
@@ -37,16 +37,15 @@
       }).addTo(map);
 
       const remoteMarkers = new Map();
-      socket.on('server:location:update', (data) => {
+      socket.on("server:location:update", (data) => {
         const { id, latitude, longitude } = data;
         if (!remoteMarkers.has(id)) {
-          const marker = L.marker([latitude, longitude])
-            .addTo(map)
-            .bindPopup(id);
+          const marker = L.marker([latitude, longitude]);
+          marker.addTo(map).bindPopup(id);
           remoteMarkers.set(id, marker);
         } else {
           const existingMarker = remoteMarkers.get(id);
-          existingMarker.setLatLng([latitude, longitude]); 
+          existingMarker.setLatLng([latitude, longitude]);
         }
       });
 
@@ -71,23 +70,23 @@
         });
       }
 
-      let myCurrentLocationMarker= null
+      let myCurrentLocationMarker = null;
 
-      async function main(){
-        setInterval(async()=>{
-            const {latitude, longitude} = await getUserSCurrentLocation()
-            socket.emit('client:location:update', {latitude, longitude})
-            if(!myCurrentLocationMarker){
-               myCurrentLocationMarker = L.marker([latitude, longitude]).addTo(map).bindPopup("You are here")
-            }else{
-                myCurrentLocationMarker.setLatLng([latitude, longitude])
-            }
-
-
-        }, 10*1000)
+      async function main() {
+        setInterval(async () => {
+          const { latitude, longitude } = await getUserSCurrentLocation();
+          socket.emit("client:location:update", { latitude, longitude });
+          if (!myCurrentLocationMarker) {
+            myCurrentLocationMarker = L.marker([latitude, longitude])
+              .addTo(map)
+              .bindPopup("You are here");
+          } else {
+            myCurrentLocationMarker.setLatLng([latitude, longitude]);
+          }
+        }, 10 * 1000);
       }
 
-     window.addEventListener('load', main)
+      window.addEventListener("load", main);
     </script>
   </body>
 </html>
